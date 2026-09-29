@@ -19,6 +19,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.example.smartpantrymanager.utils.RecipeSeeder;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -53,6 +54,7 @@ public class MainActivity extends AppCompatActivity {
         recyclerViewPantry.setAdapter(pantryAdapter);
 
         db = FirebaseFirestore.getInstance();
+        RecipeSeeder.seedRecipes(db);
 
         buttonAddIngredient.setOnClickListener(v -> {
             Intent intent = new Intent(
