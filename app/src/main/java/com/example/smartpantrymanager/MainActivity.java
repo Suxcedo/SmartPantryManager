@@ -40,7 +40,11 @@ public class MainActivity extends AppCompatActivity {
 
         pantryItems = new ArrayList<>();
 
-        pantryAdapter = new PantryAdapter(pantryItems);
+        pantryAdapter = new PantryAdapter(
+                pantryItems,
+                item -> editIngredient(item),
+                item -> deleteIngredient(item)
+        );
 
         recyclerViewPantry.setLayoutManager(
                 new LinearLayoutManager(this)
@@ -109,6 +113,47 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(
                             this,
                             "Failed to load pantry: " + e.getMessage(),
+                            Toast.LENGTH_LONG
+                    ).show();
+                });
+    }
+
+    private void editIngredient(PantryItem item) {
+
+        Intent intent = new Intent(
+                MainActivity.this,
+                AddEditIngredientActivity.class
+        );
+
+        intent.putExtra("ingredientId", item.getId());
+        intent.putExtra("ingredientName", item.getName());
+        intent.putExtra("ingredientQuantity", item.getQuantity());
+        intent.putExtra("ingredientUnit", item.getUnit());
+        intent.putExtra("ingredientExpiry", item.getExpiryDate());
+
+        startActivity(intent);
+    }
+
+    private void deleteIngredient(PantryItem item) {
+
+        db.collection("pantryItems")
+                .document(item.getId())
+                .delete()
+                .addOnSuccessListener(unused -> {
+
+                    Toast.makeText(
+                            this,
+                            "Ingredient deleted",
+                            Toast.LENGTH_SHORT
+                    ).show();
+
+                    loadPantryItems();
+                })
+                .addOnFailureListener(e -> {
+
+                    Toast.makeText(
+                            this,
+                            "Failed to delete ingredient: " + e.getMessage(),
                             Toast.LENGTH_LONG
                     ).show();
                 });
