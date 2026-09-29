@@ -5,6 +5,7 @@ plugins {
 
 android {
     namespace = "com.example.smartpantrymanager"
+
     compileSdk {
         version = release(37)
     }
@@ -38,6 +39,8 @@ dependencies {
     implementation(libs.appcompat)
     implementation(libs.constraintlayout)
     implementation(libs.material)
+
+    implementation("androidx.recyclerview:recyclerview:1.4.0")
 
     implementation(platform("com.google.firebase:firebase-bom:34.19.0"))
     implementation("com.google.firebase:firebase-firestore")
