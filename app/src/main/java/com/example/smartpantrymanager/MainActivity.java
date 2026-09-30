@@ -42,6 +42,9 @@ public class MainActivity extends AppCompatActivity {
         Button buttonSuggestedRecipes =
                 findViewById(R.id.buttonSuggestedRecipes);
 
+        Button buttonSettings =
+                findViewById(R.id.buttonSettings);
+
         recyclerViewPantry =
                 findViewById(R.id.recyclerViewPantry);
 
@@ -78,6 +81,16 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(
                     MainActivity.this,
                     SuggestedRecipesActivity.class
+            );
+
+            startActivity(intent);
+        });
+
+        buttonSettings.setOnClickListener(v -> {
+
+            Intent intent = new Intent(
+                    MainActivity.this,
+                    SettingsActivity.class
             );
 
             startActivity(intent);
