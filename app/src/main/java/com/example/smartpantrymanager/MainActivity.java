@@ -15,11 +15,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.smartpantrymanager.adapters.PantryAdapter;
 import com.example.smartpantrymanager.models.PantryItem;
+import com.example.smartpantrymanager.utils.RecipeSeeder;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.List;
-import com.example.smartpantrymanager.utils.RecipeSeeder;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -36,8 +36,14 @@ public class MainActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
 
-        Button buttonAddIngredient = findViewById(R.id.buttonAddIngredient);
-        recyclerViewPantry = findViewById(R.id.recyclerViewPantry);
+        Button buttonAddIngredient =
+                findViewById(R.id.buttonAddIngredient);
+
+        Button buttonSuggestedRecipes =
+                findViewById(R.id.buttonSuggestedRecipes);
+
+        recyclerViewPantry =
+                findViewById(R.id.recyclerViewPantry);
 
         pantryItems = new ArrayList<>();
 
@@ -54,12 +60,24 @@ public class MainActivity extends AppCompatActivity {
         recyclerViewPantry.setAdapter(pantryAdapter);
 
         db = FirebaseFirestore.getInstance();
+
         RecipeSeeder.seedRecipes(db);
 
         buttonAddIngredient.setOnClickListener(v -> {
+
             Intent intent = new Intent(
                     MainActivity.this,
                     AddEditIngredientActivity.class
+            );
+
+            startActivity(intent);
+        });
+
+        buttonSuggestedRecipes.setOnClickListener(v -> {
+
+            Intent intent = new Intent(
+                    MainActivity.this,
+                    SuggestedRecipesActivity.class
             );
 
             startActivity(intent);
@@ -155,7 +173,8 @@ public class MainActivity extends AppCompatActivity {
 
                     Toast.makeText(
                             this,
-                            "Failed to delete ingredient: " + e.getMessage(),
+                            "Failed to delete ingredient: "
+                                    + e.getMessage(),
                             Toast.LENGTH_LONG
                     ).show();
                 });
