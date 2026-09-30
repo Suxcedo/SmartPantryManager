@@ -1,8 +1,11 @@
 package com.example.smartpantrymanager;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -18,8 +21,13 @@ import com.example.smartpantrymanager.models.PantryItem;
 import com.example.smartpantrymanager.utils.RecipeSeeder;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -27,7 +35,20 @@ public class MainActivity extends AppCompatActivity {
     private PantryAdapter pantryAdapter;
     private List<PantryItem> pantryItems;
 
+    private TextView textExpiryTitle;
+    private TextView textExpiryWarnings;
+
     private FirebaseFirestore db;
+
+    private SharedPreferences preferences;
+
+    private static final String PREFS_NAME =
+            "SmartPantryPreferences";
+
+    private static final String EXPIRY_REMINDERS =
+            "expiryReminders";
+
+    private static final int EXPIRY_WARNING_DAYS = 7;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +69,12 @@ public class MainActivity extends AppCompatActivity {
         recyclerViewPantry =
                 findViewById(R.id.recyclerViewPantry);
 
+        textExpiryTitle =
+                findViewById(R.id.textExpiryTitle);
+
+        textExpiryWarnings =
+                findViewById(R.id.textExpiryWarnings);
+
         pantryItems = new ArrayList<>();
 
         pantryAdapter = new PantryAdapter(
@@ -63,6 +90,11 @@ public class MainActivity extends AppCompatActivity {
         recyclerViewPantry.setAdapter(pantryAdapter);
 
         db = FirebaseFirestore.getInstance();
+
+        preferences = getSharedPreferences(
+                PREFS_NAME,
+                MODE_PRIVATE
+        );
 
         RecipeSeeder.seedRecipes(db);
 
@@ -134,21 +166,140 @@ public class MainActivity extends AppCompatActivity {
                     for (var document : queryDocumentSnapshots) {
 
                         PantryItem item =
-                                document.toObject(PantryItem.class);
+                                document.toObject(
+                                        PantryItem.class
+                                );
 
                         pantryItems.add(item);
                     }
 
                     pantryAdapter.notifyDataSetChanged();
+
+                    checkExpiryWarnings();
                 })
                 .addOnFailureListener(e -> {
 
                     Toast.makeText(
                             this,
-                            "Failed to load pantry: " + e.getMessage(),
+                            "Failed to load pantry: "
+                                    + e.getMessage(),
                             Toast.LENGTH_LONG
                     ).show();
                 });
+    }
+
+    private void checkExpiryWarnings() {
+
+        boolean remindersEnabled =
+                preferences.getBoolean(
+                        EXPIRY_REMINDERS,
+                        true
+                );
+
+        if (!remindersEnabled) {
+
+            textExpiryTitle.setVisibility(View.GONE);
+            textExpiryWarnings.setVisibility(View.GONE);
+
+            return;
+        }
+
+        List<String> warnings =
+                new ArrayList<>();
+
+        SimpleDateFormat dateFormat =
+                new SimpleDateFormat(
+                        "yyyy-MM-dd",
+                        Locale.getDefault()
+                );
+
+        dateFormat.setLenient(false);
+
+        Date today = new Date();
+
+        for (PantryItem item : pantryItems) {
+
+            String expiryDate =
+                    item.getExpiryDate();
+
+            if (expiryDate == null ||
+                    expiryDate.trim().isEmpty()) {
+
+                continue;
+            }
+
+            try {
+
+                Date expiry =
+                        dateFormat.parse(
+                                expiryDate.trim()
+                        );
+
+                if (expiry == null) {
+                    continue;
+                }
+
+                long difference =
+                        expiry.getTime()
+                                - today.getTime();
+
+                long daysRemaining =
+                        TimeUnit.MILLISECONDS.toDays(
+                                difference
+                        );
+
+                if (daysRemaining < 0) {
+
+                    warnings.add(
+                            "• " + item.getName()
+                                    + " - Expired on "
+                                    + expiryDate
+                    );
+
+                } else if (
+                        daysRemaining
+                                <= EXPIRY_WARNING_DAYS) {
+
+                    warnings.add(
+                            "• " + item.getName()
+                                    + " - Expires in "
+                                    + daysRemaining
+                                    + " day(s) ("
+                                    + expiryDate
+                                    + ")"
+                    );
+                }
+
+            } catch (ParseException e) {
+
+                // Ignore invalid expiry dates.
+            }
+        }
+
+        if (warnings.isEmpty()) {
+
+            textExpiryTitle.setVisibility(View.GONE);
+            textExpiryWarnings.setVisibility(View.GONE);
+
+        } else {
+
+            textExpiryTitle.setVisibility(View.VISIBLE);
+            textExpiryWarnings.setVisibility(View.VISIBLE);
+
+            StringBuilder warningText =
+                    new StringBuilder();
+
+            for (String warning : warnings) {
+
+                warningText
+                        .append(warning)
+                        .append("\n");
+            }
+
+            textExpiryWarnings.setText(
+                    warningText.toString().trim()
+            );
+        }
     }
 
     private void editIngredient(PantryItem item) {
@@ -158,11 +309,30 @@ public class MainActivity extends AppCompatActivity {
                 AddEditIngredientActivity.class
         );
 
-        intent.putExtra("ingredientId", item.getId());
-        intent.putExtra("ingredientName", item.getName());
-        intent.putExtra("ingredientQuantity", item.getQuantity());
-        intent.putExtra("ingredientUnit", item.getUnit());
-        intent.putExtra("ingredientExpiry", item.getExpiryDate());
+        intent.putExtra(
+                "ingredientId",
+                item.getId()
+        );
+
+        intent.putExtra(
+                "ingredientName",
+                item.getName()
+        );
+
+        intent.putExtra(
+                "ingredientQuantity",
+                item.getQuantity()
+        );
+
+        intent.putExtra(
+                "ingredientUnit",
+                item.getUnit()
+        );
+
+        intent.putExtra(
+                "ingredientExpiry",
+                item.getExpiryDate()
+        );
 
         startActivity(intent);
     }

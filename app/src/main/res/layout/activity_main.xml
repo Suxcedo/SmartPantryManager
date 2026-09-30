@@ -1,84 +1,87 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true">
+    android:orientation="vertical"
+    android:padding="24dp">
 
-    <LinearLayout
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/app_name"
+        android:textSize="30sp"
+        android:textStyle="bold" />
+
+    <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="24dp">
+        android:text="Manage your pantry and discover recipes you can make."
+        android:textSize="16sp"
+        android:layout_marginTop="6dp"
+        android:layout_marginBottom="16dp" />
 
-        <!-- App heading -->
+    <Button
+        android:id="@+id/buttonAddIngredient"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/add_ingredient"
+        android:layout_marginBottom="8dp" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/app_name"
-            android:textSize="30sp"
-            android:textStyle="bold" />
+    <Button
+        android:id="@+id/buttonSuggestedRecipes"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Suggested Recipes"
+        android:layout_marginBottom="8dp" />
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Manage your pantry and discover recipes you can make."
-            android:textSize="16sp"
-            android:layout_marginTop="6dp"
-            android:layout_marginBottom="24dp" />
+    <Button
+        android:id="@+id/buttonSettings"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Settings"
+        android:layout_marginBottom="16dp" />
 
-        <!-- Main actions -->
+    <TextView
+        android:id="@+id/textExpiryTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Expiring Soon"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="8dp"
+        android:visibility="gone" />
 
-        <Button
-            android:id="@+id/buttonAddIngredient"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/add_ingredient"
-            android:layout_marginBottom="10dp" />
+    <TextView
+        android:id="@+id/textExpiryWarnings"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:layout_marginBottom="16dp"
+        android:visibility="gone" />
 
-        <Button
-            android:id="@+id/buttonSuggestedRecipes"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Suggested Recipes"
-            android:layout_marginBottom="28dp" />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Your Pantry"
+        android:textSize="24sp"
+        android:textStyle="bold" />
 
-        <Button
-            android:id="@+id/buttonSettings"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Settings"
-            android:layout_marginBottom="28dp" />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Saved ingredients are shown below."
+        android:textSize="15sp"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="8dp" />
 
-        <!-- Pantry section -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewPantry"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:clipToPadding="false"
+        android:paddingBottom="16dp" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Your Pantry"
-            android:textSize="24sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Saved ingredients are shown below."
-            android:textSize="15sp"
-            android:layout_marginTop="4dp"
-            android:layout_marginBottom="16dp" />
-
-        <!-- Pantry items -->
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerViewPantry"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:nestedScrollingEnabled="false"
-            android:clipToPadding="false"
-            android:paddingBottom="16dp" />
-
-    </LinearLayout>
-
-</ScrollView>
+</LinearLayout>
